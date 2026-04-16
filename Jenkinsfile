@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "jordan0638/app:latest"
+    }
+
     stages {
 
         stage('Clone') {
@@ -16,15 +20,15 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
-                bat 'docker build -t myapp .'
+                bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
 
-        stage('Run') {
+        stage('Push to DockerHub') {
             steps {
-                bat 'docker run -d -p 8081:8080 myapp'
+                bat "docker push %DOCKER_IMAGE%"
             }
         }
     }
