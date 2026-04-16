@@ -23,12 +23,21 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 bat "docker build -t %DOCKER_IMAGE% ."
+                }
             }
-        }
+
+        stage("Docker Run") {
+            steps {
+                bat "docker run -d -p 8082:8080 %DOCKER_IMAGE%"
+                }
+            }
 
         stage('Push to DockerHub') {
             steps {
-                bat "docker push %DOCKER_IMAGE%"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_creds',usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    bat 'docker login -u %USER% -p %PASS%'
+                    bat "docker push %DOCKER_IMAGE%"
+                }
             }
         }
     }
